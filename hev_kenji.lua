@@ -1,4 +1,4 @@
--- [[ Hev kenji Script - Steal an Egg (Super Safe Edition) ]]
+-- [[ Hev kenji Script - Steal an Egg (Anti BAC-3511 Bypass) ]]
 
 local Players = game:GetService("Players")
 local VirtualUser = game:GetService("VirtualUser")
@@ -15,31 +15,28 @@ LocalPlayer.Idled:Connect(function()
 end)
 
 -- ==========================================
--- ២. ការកំណត់សុវត្ថិភាព (SAFE SETTINGS)
+-- ២. មុខងារ លួចពងបែបធម្មជាតិ (Safe Walk Steal)
 -- ==========================================
-local Settings = {
-    LouchPong = true,      -- បើកមុខងារលួចពងសុវត្ថិភាព
-    SafeDelay = 1.0        -- រង់ចាំ ១ វិនាទីម្តង (កុំឱ្យ Anti-Cheat ចាប់បាន)
-}
+local SafeStealActive = true
 
--- ==========================================
--- ៣. មុខងារ លួចពងមាន់សុវត្ថិភាព (Safe Steal)
--- ==========================================
 task.spawn(function()
-    while task.wait(Settings.SafeDelay) do
-        if Settings.LouchPong then
+    while task.wait(1.5) do -- រង់ចាំ ១.៥ វិនាទីម្តង
+        if SafeStealActive then
             pcall(function()
                 local char = LocalPlayer.Character
-                if char and char:FindFirstChild("HumanoidRootPart") then
+                if char and char:FindFirstChild("HumanoidRootPart") and char:FindFirstChild("Humanoid") then
                     local hrp = char.HumanoidRootPart
+                    local humanoid = char.Humanoid
                     
+                    -- ស្វែងរកពងមាន់ដែលនៅជិតបំផុត
                     for _, obj in pairs(workspace:GetDescendants()) do
                         if obj:IsA("BasePart") and (obj.Name:lower():find("egg") or (obj.Parent and obj.Parent.Name:lower():find("egg"))) then
-                            -- លួចតែពងណាដែលនៅជិតខ្លួនខ្លាំង (ចម្ងាយក្រោម ១៥)
-                            if (hrp.Position - obj.Position).Magnitude <= 15 then
-                                firetouchinterest(hrp, obj, 0)
-                                task.wait(0.1)
-                                firetouchinterest(hrp, obj, 1)
+                            local dist = (hrp.Position - obj.Position).Magnitude
+                            
+                            -- បើសិនជានៅជិត (ក្រោម ១០ studs) បញ្ជាឱ្យតួអង្គដើរទៅបុកពងដោយផ្ទាល់
+                            if dist <= 10 then
+                                humanoid:MoveTo(obj.Position)
+                                task.wait(0.5)
                             end
                         end
                     end
@@ -49,4 +46,4 @@ task.spawn(function()
     end
 end)
 
-print("Hev kenji Script (Super Safe): បានដំណើរការដោយជោគជ័យ!")
+print("Hev kenji Script (Anti BAC-3511 Bypass): បានដំណើរការដោយជោគជ័យ!")
