@@ -1,49 +1,55 @@
--- [[ Hev kenji Script - Steal an Egg (Anti BAC-3511 Bypass) ]]
+-- [[ Hev kenji Script - Steal an Egg (Ghost Mode / No Detection) ]]
 
 local Players = game:GetService("Players")
 local VirtualUser = game:GetService("VirtualUser")
 local LocalPlayer = Players.LocalPlayer
 
 -- ==========================================
--- ១. មុខងារ ANTI-AFK (ការពារការ KICK ពេលទុកចោល)
+-- ១. មុខងារ ANTI-AFK (សុវត្ថិភាព 100%)
 -- ==========================================
 LocalPlayer.Idled:Connect(function()
     VirtualUser:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
     task.wait(1)
     VirtualUser:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-    print("Hev kenji: Anti-AFK កំពុងដំណើរការ")
+    print("Hev kenji: Anti-AFK Active")
 end)
 
 -- ==========================================
--- ២. មុខងារ លួចពងបែបធម្មជាតិ (Safe Walk Steal)
+-- ២. បង្កើតប៊ូតុងលួចពងនៅលើអេក្រង់ (Manual Click Safe)
 -- ==========================================
-local SafeStealActive = true
+local ScreenGui = Instance.new("ScreenGui")
+local Button = Instance.new("TextButton")
 
-task.spawn(function()
-    while task.wait(1.5) do -- រង់ចាំ ១.៥ វិនាទីម្តង
-        if SafeStealActive then
-            pcall(function()
-                local char = LocalPlayer.Character
-                if char and char:FindFirstChild("HumanoidRootPart") and char:FindFirstChild("Humanoid") then
-                    local hrp = char.HumanoidRootPart
-                    local humanoid = char.Humanoid
-                    
-                    -- ស្វែងរកពងមាន់ដែលនៅជិតបំផុត
-                    for _, obj in pairs(workspace:GetDescendants()) do
-                        if obj:IsA("BasePart") and (obj.Name:lower():find("egg") or (obj.Parent and obj.Parent.Name:lower():find("egg"))) then
-                            local dist = (hrp.Position - obj.Position).Magnitude
-                            
-                            -- បើសិនជានៅជិត (ក្រោម ១០ studs) បញ្ជាឱ្យតួអង្គដើរទៅបុកពងដោយផ្ទាល់
-                            if dist <= 10 then
-                                humanoid:MoveTo(obj.Position)
-                                task.wait(0.5)
-                            end
-                        end
+ScreenGui.Parent = game.CoreGui
+ScreenGui.Name = "HevKenjiGui"
+
+Button.Parent = ScreenGui
+Button.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+Button.Position = UDim2.new(0.85, 0, 0.4, 0)
+Button.Size = UDim2.new(0, 100, 0, 50)
+Button.Text = "លួចពង"
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.TextSize = 18
+Button.Active = true
+Button.Draggable = true
+
+-- នៅពេលចុចប៊ូតុង ទើបវាធ្វើការលួចពង 1 ដង (មិនប្រើ Loop)
+Button.MouseButton1Click:Connect(function()
+    pcall(function()
+        local char = LocalPlayer.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            local hrp = char.HumanoidRootPart
+            for _, obj in pairs(workspace:GetDescendants()) do
+                if obj:IsA("BasePart") and (obj.Name:lower():find("egg") or (obj.Parent and obj.Parent.Name:lower():find("egg"))) then
+                    if (hrp.Position - obj.Position).Magnitude <= 12 then
+                        firetouchinterest(hrp, obj, 0)
+                        task.wait(0.05)
+                        firetouchinterest(hrp, obj, 1)
                     end
                 end
-            end)
+            end
         end
-    end
+    end)
 end)
 
-print("Hev kenji Script (Anti BAC-3511 Bypass): បានដំណើរការដោយជោគជ័យ!")
+print("Hev kenji Script (Ghost Mode Loaded!)")
